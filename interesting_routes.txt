@@ -1,0 +1,3 @@
+https://www.aainflight.com/api/v1/connectivity/viasat/flight
+
+https://www.aainflight.com/api/v1/connectivity/viasat/services

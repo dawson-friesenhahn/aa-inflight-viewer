@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% if title %}
+        <title>{{ title }} - AAInflightViewer</title>
+        {% else %}
+        <title>AAInflightViewer</title>
+        {% endif %}
+        {% include "/bootstrap/_bootstrap_css.html" %}
+    </head>
+    <body>
+        {% include "/bootstrap/_bootstrap_js.html" %}
+
+        {% include "_navbar.html" %}
+        {% block content %}{% endblock %}
+    </body>
+</html>
