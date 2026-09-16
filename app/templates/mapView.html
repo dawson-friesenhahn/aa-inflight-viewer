@@ -1,67 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- https://globe.gl/ -->
-<script src="/static/globe.js"></script>
-<script type="importmap">
+
+<div class="container" id="globe"></div>
+<script id="jinja-data" type="application/json">
 {
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"
-  }
+  "flight_info_route": "{{ flight_info_route }}"
 }
 </script>
 
-
-<div class="container" id="globe"></div>
-<script type="module">
-
-    import * as THREE from 'three';
-    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-    let plane_model = null;
-    let plane_data = [await getFlightInfo()];
-
-
-    const loader = new GLTFLoader();
-    loader.load("/static/plane/plane.gltf", function(gltf){
-        plane_model = gltf.scene;
-        plane_model.scale.setScalar(4);
-        console.log("loaded cad model, I guess");
-    });
-
-    let globe = new Globe(document.getElementById('globe'));
-    globe.globeImageUrl("/static/earth-blue-marble.jpg")
-    globe.customLayerData(plane_data);
-    globe.customThreeObject( () => { return plane_model ? plane_model.clone() : new THREE.Object3D();});
-    globe.customThreeObjectUpdate((obj, data) => {
-        if (data){
-            Object.assign(obj.position, globe.getCoords(data["latitude"], data["longitude"], 0.1));
-            
-            
-            console.log("setting...");
-        } 
-     });
-
-    async function getFlightInfo(){
-        let flight_info_json = await fetch("{{ flight_info_route }}")
-        .then(response => response.json());
-        return flight_info_json;
-    }
-
-
-    
-
-    async function updateGui() {
-      plane_data = [await getFlightInfo()];
-      console.log(plane_data);
-      globe.customLayerData(plane_data);
-    }
-
-    setInterval(updateGui, 5000);
-
-</script>
-
-
-
+<script src="static/dist/assets/map_view-Ld5SUBY2.js" type="module"></script>
 
 {% endblock %}
