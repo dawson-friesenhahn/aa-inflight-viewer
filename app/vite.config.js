@@ -5,8 +5,11 @@ export default defineConfig({
     build: {
         outDir: "static/dist",
         emptyOutDir: true,
-        rollupOptions: {
+        rolldownOptions: {
             input: resolve(__dirname, "js_src/map_view.js"),
+            output: {
+                "entryFileNames": "[name].js"
+            }
         },
     },
 });
