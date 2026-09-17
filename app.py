@@ -19,7 +19,7 @@ def about():
 @app.route("/fakeFlight.json")
 def fakeFlight():
 
-    with open("flight.json", "r") as f:
+    with open("example_json/flight.json", "r") as f:
         return jsonify(json.load(f))
 
 
