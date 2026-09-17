@@ -22,6 +22,11 @@ def fakeFlight():
     with open("example_json/flight.json", "r") as f:
         return jsonify(json.load(f))
 
+@app.route("/fakeServices.json")
+def fakeServices():
+    with open("example_json/services.json", "r") as f:
+        return jsonify(json.load(f))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
