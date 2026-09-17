@@ -1,13 +1,50 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="container" id="globe"></div>
 <script id="jinja-data" type="application/json">
 {
   "flight_info_route": "{{ flight_info_route }}"
 }
 </script>
 
+<!-- Stolen from gemini. Can we do better? Dynamic sizing? -->
+<!-- Wrapper: relative positioning + zero margins/padding -->
+<div class="position-relative w-100 vh-100 overflow-hidden">
+  
+  <!-- Globe Canvas -->
+  <div class="container-fluid p-0 w-100 h-100" id="globe"></div>
+
+  <!-- HUD Overlay: absolute, top-left, flexbox gap -->
+  <div class="position-absolute top-0 start-0 p-3 d-flex gap-2 pe-none" style="z-index: 10;">
+    
+    <!-- HUD Card 1 -->
+    <div class="bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary pe-auto">
+      <small class="text-uppercase text-secondary d-block fs-7">Altitude</small>
+      <span class="fw-bold font-monospace text-info fs-5" id="hud-altitude"></span>
+    </div>
+
+    <!-- HUD Card 2 -->
+    <div class="bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary pe-auto">
+      <small class="text-uppercase text-secondary d-block fs-7">Airspeed</small>
+      <span class="fw-bold font-monospace text-info fs-5" id="hud-airspeed"></span>
+    </div>
+
+    <div class="bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary pe-auto">
+      <small class="text-uppercase text-secondary d-block fs-7">Groundspeed</small>
+      <span class="fw-bold font-monospace text-info fs-5" id="hud-groundspeed"></span>
+    </div>
+
+    <div class="bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary pe-auto">
+      <small class="text-uppercase text-secondary d-block fs-7">Heading</small>
+      <span class="fw-bold font-monospace text-info fs-5" id="hud-heading"></span>
+    </div>
+  </div>
+</div>
+
+
 <script src="static/dist/map_view.js" type="module"></script>
+
+
+
 
 {% endblock %}

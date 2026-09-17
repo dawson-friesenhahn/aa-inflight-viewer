@@ -30,9 +30,18 @@ function headingToRotationRad(heading){
 }
 
 
+function sanitizeHeading(heading){
+    return ((heading % 360) + 360) % 360;
+}
+
 async function updateGui() {
-    let plane_data = [await getFlightInfo()];
-    globe.customLayerData(plane_data);
+    let plane_data = await getFlightInfo();
+    document.getElementById("hud-altitude").innerText = `${plane_data["altitude"]} feet`;
+    document.getElementById("hud-airspeed").innerText = `${plane_data["airspeed"]} mph`;
+    document.getElementById("hud-groundspeed").innerText = `${plane_data["groundspeed"]} mph`;
+    document.getElementById("hud-heading").innerText = `${sanitizeHeading(plane_data["heading"])}°`;
+
+    globe.customLayerData([plane_data]);
 }
 
 
@@ -87,5 +96,9 @@ loader.load("/static/plane/plane.gltf", function(gltf){
         }
     );
     updateGui();
+    getFlightInfo().then( (result) => {
+        globe.pointOfView({"lat": result["latitude"], "lng": result["longitude"], altitude: 1.5}, 3000);
+    })
+    
     setInterval(updateGui, 5000);
 });
