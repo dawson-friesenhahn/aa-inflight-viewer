@@ -1,5 +1,9 @@
-from flask import Flask, render_template, jsonify, url_for
+from flask import Flask, render_template, jsonify, url_for, request
 import json
+
+from airports import Airports
+airports = Airports()
+
 
 app = Flask(__name__, )
 
@@ -26,6 +30,16 @@ def fakeFlight():
 def fakeServices():
     with open("example_json/services.json", "r") as f:
         return jsonify(json.load(f))
+
+@app.route("/airportInfo/<code>")
+def airportInfo(code: str):
+    try:
+        airport = airports.find_by_icao_code(code)
+        if airport:
+            return jsonify(airport)
+        raise LookupError
+    except:
+        return jsonify({"error": "Airport not found"}), 404
 
 
 if __name__ == "__main__":

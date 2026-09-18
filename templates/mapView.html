@@ -7,6 +7,8 @@
 }
 </script>
 
+<a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvas-config">Show Config</a>
+<a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvas-json">Show All JSON</a>
 <!-- Stolen from gemini. Can we do better? Dynamic sizing? -->
 <!-- Wrapper: relative positioning + zero margins/padding -->
 <div class="position-relative w-100 vh-100 overflow-hidden">
@@ -38,8 +40,34 @@
       <small class="text-uppercase text-secondary d-block fs-7">Heading</small>
       <span class="fw-bold font-monospace text-info fs-5" id="hud-heading"></span>
     </div>
+    
   </div>
 </div>
+
+<!-- Show All the JSON -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-json" aria-labelledby="offcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasLabel">All JSON View</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body" id="json-view-body">
+    Content for the offcanvas goes here. You can place just about any Bootstrap component or custom elements here.
+  </div>
+</div>
+
+
+
+<!-- Show All the JSON -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas-config" aria-labelledby="offcanvasLabel2">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasLabel2">Config</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body" id="config-view-body">
+    Config Stuff
+  </div>
+</div>
+
 
 
 <script src="static/dist/map_view.js" type="module"></script>

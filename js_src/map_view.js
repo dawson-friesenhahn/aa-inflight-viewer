@@ -1,24 +1,47 @@
 import Globe from "globe.gl";
 import * as THREE from "three";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { degToRad } from "three/src/math/MathUtils.js";
 
 let PLANE_SCALE = 4;
+
+function getMapMarkerHTML(textLabel){
+    return `<div class="container btn-info">${textLabel}</div>`
+}
 
 const jinja_data = JSON.parse(
     document.getElementById("jinja-data").textContent
 );
 
 async function getFlightInfo(){
-    let flight_info_json = await fetch(jinja_data["flight_info_route"])
-    .then(response => response.json());
-    return flight_info_json;
+    let flight_info_resp= await fetch(jinja_data["flight_info_route"]);
+    
+    let flight_json = await flight_info_resp.json();
+    return flight_json;
 }
+
+async function getAirportInfo(airport_code){
+    
+    let info = await fetch(`/airportInfo/${airport_code}`);
+    
+    info = await info.json();
+    
+    //do this so html elements get added properly to the globe
+    info["lat"] = info["latitude"];
+    info["lng"] = info["longitude"];
+
+    return info;
+}
+
+let origin = null;
+let destination = null;
 
 //y is north pole,
 //z comes out prime meridian at equator
 //x is y cross z
 let globe = new Globe(document.getElementById('globe'));
 globe.globeImageUrl("/static/earth-blue-marble.jpg")
+//globe.globeTileEngineUrl((x, y, l) => `https://tile.openstreetmap.org/${l}/${x}/${y}.png`);
 
 function headingToRotationRad(heading){
     //0 is 90
@@ -43,6 +66,26 @@ async function updateGui() {
 
     globe.customLayerData([plane_data]);
 }
+
+
+function haversine(theta_rad){
+    return Math.pow(Math.sin(theta_rad/2), 2);
+}
+
+function haversineDistance(lat1, lng1, lat2, lng2){
+    let lat1Rad = degToRad(lat1);
+    let lng1Rad = degToRad(lng1);
+    let lat2Rad = degToRad(lat2);
+    let lng2Rad = degToRad(lng2);
+
+    return (
+        haversine(lat2Rad-lat1Rad) 
+        + Math.cos(lat1Rad)
+        * Math.cos(lat2Rad)
+        * haversine(lng2Rad-lng1Rad)
+    )
+}
+
 
 
 /**
@@ -96,8 +139,34 @@ loader.load("/static/plane/plane.gltf", function(gltf){
         }
     );
     updateGui();
-    getFlightInfo().then( (result) => {
+    getFlightInfo().then( async (result) => {
         globe.pointOfView({"lat": result["latitude"], "lng": result["longitude"], altitude: 1.5}, 3000);
+        
+        origin = await getAirportInfo(result["origin"]);
+
+        destination = await getAirportInfo(result["destination"]);
+        
+        globe.htmlElementsData([origin, destination])
+        .htmlElement( d => {
+            const el = document.createElement("div");
+            el.innerHTML = getMapMarkerHTML(d["city"]);
+            // el.style.color = "red";
+            // el.style.width = "10px";
+            el.style.transition = "opacity 250ms";
+
+
+            el.style['pointer-events'] = 'auto';
+            el.style.cursor = 'pointer';
+            // el.style.transform = 'translate(-50%, -50%)'; 
+            el.onclick = () => console.info(d);
+            return el;
+        })
+        .htmlElementVisibilityModifier(
+            (el, isVisible) => {
+                el.style.opacity = isVisible ? 1 : 0;
+            }
+        )
+         
     })
     
     setInterval(updateGui, 5000);
