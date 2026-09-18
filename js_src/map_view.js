@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 
 let PLANE_SCALE = 4;
+let EARTH_RADIUS_MILES = 3960;
 
 function getMapMarkerHTML(textLabel){
     return `<div class="container btn-info">${textLabel}</div>`
@@ -72,18 +73,30 @@ function haversine(theta_rad){
     return Math.pow(Math.sin(theta_rad/2), 2);
 }
 
-function haversineDistance(lat1, lng1, lat2, lng2){
+function haversineDistanceMiles(origin, destination){
+    let angle = haversineDistanceAngle(
+        origin["latitude"], 
+        origin["longitude"], 
+        destination["latitude"], 
+        destination["longitude"]
+    );
+    return angle * EARTH_RADIUS_MILES;
+}
+
+
+function haversineDistanceAngle(lat1, lng1, lat2, lng2){
     let lat1Rad = degToRad(lat1);
     let lng1Rad = degToRad(lng1);
     let lat2Rad = degToRad(lat2);
     let lng2Rad = degToRad(lng2);
 
-    return (
+    let havTheta = (
         haversine(lat2Rad-lat1Rad) 
         + Math.cos(lat1Rad)
         * Math.cos(lat2Rad)
         * haversine(lng2Rad-lng1Rad)
     )
+    return 2 * Math.asin(Math.sqrt(havTheta));
 }
 
 
