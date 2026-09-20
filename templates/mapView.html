@@ -56,27 +56,39 @@
     <div class="d-flex flex-nowrap gap-2 overflow-x-auto pb-2 hud-scroll-container">
       
       <!-- Altitude -->
-      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0">
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0" id="hud-altitude-wrapper">
         <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Altitude</div>
         <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-altitude"></div>
       </div>
 
       <!-- Airspeed -->
-      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0">
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0" id="hud-airspeed-wrapper">
         <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Airspeed</div>
         <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-airspeed"></div>
       </div>
 
       <!-- Groundspeed -->
-      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0">
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0" id="hud-groundspeed-wrapper">
         <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Groundspeed</div>
         <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-groundspeed"></div>
       </div>
 
       <!-- Heading -->
-      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0">
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0" id="hud-heading-wrapper">
         <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Heading</div>
         <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-heading"></div>
+      </div>
+
+      <!-- Distance Traveled -->
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0" id="hud-distanceTraveled-wrapper">
+        <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Distance Traveled</div>
+        <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-distanceTraveled"></div>
+      </div>
+
+      <!-- Distance Remaining -->
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0" id="hud-distanceRemaining-wrapper">
+        <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Distance Remaining</div>
+        <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-distanceRemaining"></div>
       </div>
 
     </div>
@@ -100,7 +112,10 @@
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body" id="config-view-body">
-    Config Stuff
+    
+    
+
+
   </div>
 </div>
 

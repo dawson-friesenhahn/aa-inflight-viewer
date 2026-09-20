@@ -3,10 +3,48 @@ import * as THREE from "three";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 
-let PLANE_SCALE = 4;
+let PLANE_SCALE = 1;
 let EARTH_RADIUS_MILES = 3960;
 
 const mapWrapper = document.getElementById("map-wrapper");
+
+
+function addHUDToggle(checkboxID, HUD_ID, label){
+    const configParent = document.getElementById("config-view-body");
+    
+    let el = document.createElement("div");
+    
+    el.innerHTML= `
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" checked id="${checkboxID}">
+      <label class="form-check-label" for="${checkboxID}">
+        ${label}
+      </label>
+    </div>
+    `
+    configParent.appendChild(el);
+    document.getElementById(checkboxID).addEventListener("change", (el, ev) =>{
+        if (document.getElementById(checkboxID).checked){
+            try{
+                document.getElementById(HUD_ID).classList.remove("d-none");
+            } catch {
+                // do nothing
+            }
+        } else {
+            document.getElementById(HUD_ID).classList.add("d-none");
+        }
+        
+    } );
+
+}
+
+//TODO -- probably modify this to make the HUD, too
+addHUDToggle("alt-checkbox", "hud-altitude-wrapper", "Altitude");
+addHUDToggle("airspeed-checkbox", "hud-airspeed-wrapper", "Airspeed");
+addHUDToggle("groundspeed-checkbox", "hud-groundspeed-wrapper", "Groundspeed");
+addHUDToggle("heading-checkbox", "hud-heading-wrapper", "Heading");
+addHUDToggle("distanceTraveled-checkbox", "hud-distanceTraveled-wrapper", "Distance Traveled");
+addHUDToggle("distanceRemaining-checkbox", "hud-distanceRemaining-wrapper", "Distance Remaining");
 
 function getMapMarkerHTML(textLabel){
     return `<div class="container btn-info">${textLabel}</div>`
@@ -73,6 +111,13 @@ async function updateGui() {
     document.getElementById("hud-airspeed").innerText = `${plane_data["airspeed"]} mph`;
     document.getElementById("hud-groundspeed").innerText = `${plane_data["groundspeed"]} mph`;
     document.getElementById("hud-heading").innerText = `${sanitizeHeading(plane_data["heading"])}°`;
+
+    document.getElementById("json-view-body").innerText = JSON.stringify(plane_data, null, 2);
+
+    let distance_traveled = haversineDistanceMiles(origin, plane_data);
+    document.getElementById("hud-distanceTraveled").innerText = `${distance_traveled.toFixed(0)} miles`
+    let distance_remaining = haversineDistanceMiles(plane_data, destination);
+    document.getElementById("hud-distanceRemaining").innerText = `${distance_remaining.toFixed(0)} miles`
 
     globe.customLayerData([plane_data]);
 }
@@ -152,7 +197,7 @@ loader.load("/static/plane/plane.gltf", function(gltf){
     });
     globe.customThreeObjectUpdate(
         (obj, data) => {  
-            Object.assign(obj.position, globe.getCoords(data["latitude"], data["longitude"], 0.1));
+            Object.assign(obj.position, globe.getCoords(data["latitude"], data["longitude"], 0.02));
                             
             let rot = headingToRotMatrix(data["heading"], obj.position.clone());
             let rot4 = new THREE.Matrix4().setFromMatrix3(rot);
@@ -162,7 +207,7 @@ loader.load("/static/plane/plane.gltf", function(gltf){
     );
     updateGui();
     getFlightInfo().then( async (result) => {
-        globe.pointOfView({"lat": result["latitude"], "lng": result["longitude"], altitude: 1.5}, 3000);
+        globe.pointOfView({"lat": result["latitude"], "lng": result["longitude"], altitude: 0.5}, 3000);
         
         origin = await getAirportInfo(result["origin"]);
 
