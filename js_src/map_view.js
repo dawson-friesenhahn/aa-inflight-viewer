@@ -6,6 +6,8 @@ import { degToRad } from "three/src/math/MathUtils.js";
 let PLANE_SCALE = 4;
 let EARTH_RADIUS_MILES = 3960;
 
+const mapWrapper = document.getElementById("map-wrapper");
+
 function getMapMarkerHTML(textLabel){
     return `<div class="container btn-info">${textLabel}</div>`
 }
@@ -41,7 +43,14 @@ let destination = null;
 //z comes out prime meridian at equator
 //x is y cross z
 let globe = new Globe(document.getElementById('globe'));
-globe.globeImageUrl("/static/earth-blue-marble.jpg")
+globe.globeImageUrl("/static/earth-blue-marble.jpg");
+globe.width(mapWrapper.clientWidth).height(mapWrapper.clientHeight);
+
+window.addEventListener("resize", () => {
+    globe.width(mapWrapper.clientWidth).height(mapWrapper.clientHeight);    
+});
+
+
 //globe.globeTileEngineUrl((x, y, l) => `https://tile.openstreetmap.org/${l}/${x}/${y}.png`);
 
 function headingToRotationRad(heading){

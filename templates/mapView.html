@@ -7,45 +7,84 @@
 }
 </script>
 
-<a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvas-config">Show Config</a>
-<a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvas-json">Show All JSON</a>
-<!-- Stolen from gemini. Can we do better? Dynamic sizing? -->
-<!-- Wrapper: relative positioning + zero margins/padding -->
-<div class="position-relative w-100 vh-100 overflow-hidden">
+<style>
+  /* Turn the entire page into a flex column to perfectly accommodate the navbar */
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden; /* Prevents the whole page from scrolling */
+    margin: 0;
+  }
+
+  /* Glassmorphism Effect */
+  .hud-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    min-width: 110px;
+  }
+
+  /* Enable touch-dragging/scrolling on the HUD ribbon */
+  .hud-scroll-container {
+    pointer-events: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    touch-action: pan-x; /* Restrict mobile swipe to horizontal only */
+  }
+
+  .hud-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+  }
+</style>
+
+<!-- Outer Shell: flex-grow-1 forces this div to fill the space left below the navbar -->
+<div id="map-wrapper" class="flex-grow-1 position-relative w-100 bg-dark overflow-hidden">
   
-  <!-- Globe Canvas -->
-  <div class="container-fluid p-0 w-100 h-100" id="globe"></div>
+  <!-- Globe Canvas Wrapper -->
+  <div id="globe" class="position-absolute top-0 start-0 w-100 h-100"></div>
 
-  <!-- HUD Overlay: absolute, top-left, flexbox gap -->
-  <div class="position-absolute top-0 start-0 p-3 d-flex gap-2 pe-none" style="z-index: 10;">
+  <!-- HUD Overlay Container -->
+  <div class="position-absolute top-0 start-0 w-100 p-2 p-md-3 pe-none" style="z-index: 10;">
     
-    <!-- HUD Card 1 -->
-    <div class="bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary pe-auto">
-      <small class="text-uppercase text-secondary d-block fs-7">Altitude</small>
-      <span class="fw-bold font-monospace text-info fs-5" id="hud-altitude"></span>
+    <!-- Config Buttons -->
+    <div class="d-flex gap-2 mb-2 pe-auto">
+      <a class="btn btn-sm btn-primary shadow" data-bs-toggle="offcanvas" href="#offcanvas-config">Show Config</a>
+      <a class="btn btn-sm btn-primary shadow" data-bs-toggle="offcanvas" href="#offcanvas-json">Show All JSON</a>
     </div>
 
-    <!-- HUD Card 2 -->
-    <div class="bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary pe-auto">
-      <small class="text-uppercase text-secondary d-block fs-7">Airspeed</small>
-      <span class="fw-bold font-monospace text-info fs-5" id="hud-airspeed"></span>
-    </div>
+    <!-- Horizontally Scrollable HUD Ribbon -->
+    <div class="d-flex flex-nowrap gap-2 overflow-x-auto pb-2 hud-scroll-container">
+      
+      <!-- Altitude -->
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0">
+        <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Altitude</div>
+        <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-altitude"></div>
+      </div>
 
-    <div class="bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary pe-auto">
-      <small class="text-uppercase text-secondary d-block fs-7">Groundspeed</small>
-      <span class="fw-bold font-monospace text-info fs-5" id="hud-groundspeed"></span>
-    </div>
+      <!-- Airspeed -->
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0">
+        <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Airspeed</div>
+        <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-airspeed"></div>
+      </div>
 
-    <div class="bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary pe-auto">
-      <small class="text-uppercase text-secondary d-block fs-7">Heading</small>
-      <span class="fw-bold font-monospace text-info fs-5" id="hud-heading"></span>
+      <!-- Groundspeed -->
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0">
+        <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Groundspeed</div>
+        <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-groundspeed"></div>
+      </div>
+
+      <!-- Heading -->
+      <div class="hud-card pe-auto bg-dark bg-opacity-75 text-white p-2 px-3 rounded border border-secondary border-opacity-50 shadow-sm flex-shrink-0">
+        <div class="text-uppercase text-secondary fw-semibold small" style="font-size: 0.65rem; letter-spacing: 0.05em;">Heading</div>
+        <div class="fw-bold font-monospace text-info fs-6 fs-md-5" id="hud-heading"></div>
+      </div>
+
     </div>
-    
   </div>
 </div>
 
-<!-- Show All the JSON -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-json" aria-labelledby="offcanvasLabel">
+<!-- Offcanvas Panels (z-index 1050 ensures they sit above the navbar and map) -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-json" aria-labelledby="offcanvasLabel" style="z-index: 1050;">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasLabel">All JSON View</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -55,10 +94,7 @@
   </div>
 </div>
 
-
-
-<!-- Show All the JSON -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas-config" aria-labelledby="offcanvasLabel2">
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas-config" aria-labelledby="offcanvasLabel2" style="z-index: 1050;">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasLabel2">Config</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -68,11 +104,6 @@
   </div>
 </div>
 
-
-
 <script src="static/dist/map_view.js" type="module"></script>
-
-
-
 
 {% endblock %}
