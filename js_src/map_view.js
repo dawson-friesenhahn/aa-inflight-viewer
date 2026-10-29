@@ -68,8 +68,8 @@ async function getAirportInfo(airport_code){
     info = await info.json();
     
     //do this so html elements get added properly to the globe
-    info["lat"] = info["latitude"];
-    info["lng"] = info["longitude"];
+    info["lat"] = info["lat_deg"];
+    info["lng"] = info["long_deg"];
 
     return info;
 }
@@ -106,20 +106,25 @@ function sanitizeHeading(heading){
 }
 
 async function updateGui() {
-    let plane_data = await getFlightInfo();
-    document.getElementById("hud-altitude").innerText = `${plane_data["altitude"]} feet`;
-    document.getElementById("hud-airspeed").innerText = `${plane_data["airspeed"]} mph`;
-    document.getElementById("hud-groundspeed").innerText = `${plane_data["groundspeed"]} mph`;
-    document.getElementById("hud-heading").innerText = `${sanitizeHeading(plane_data["heading"])}°`;
+    let flight_info = await getFlightInfo();
+    document.getElementById("hud-altitude").innerText = `${flight_info["altitude_feet"]} feet`;
+    document.getElementById("hud-airspeed").innerText = `${flight_info["airspeed_mph"]} mph`;
+    document.getElementById("hud-groundspeed").innerText = `${flight_info["groundspeed_mph"]} mph`;
+    document.getElementById("hud-heading").innerText = `${sanitizeHeading(flight_info["heading_deg"])}°`;
 
-    document.getElementById("json-view-body").innerText = JSON.stringify(plane_data, null, 2);
+    document.getElementById("json-view-body").innerText = JSON.stringify(
+        JSON.parse(flight_info["raw_json_source"]),
+        null,
+        2
+    );
+    
+    let distance_traveled = haversineDistanceMiles(origin, flight_info);
 
-    let distance_traveled = haversineDistanceMiles(origin, plane_data);
     document.getElementById("hud-distanceTraveled").innerText = `${distance_traveled.toFixed(0)} miles`
-    let distance_remaining = haversineDistanceMiles(plane_data, destination);
+    let distance_remaining = haversineDistanceMiles(flight_info, destination);
     document.getElementById("hud-distanceRemaining").innerText = `${distance_remaining.toFixed(0)} miles`
 
-    globe.customLayerData([plane_data]);
+    globe.customLayerData([flight_info]);
 }
 
 
@@ -128,11 +133,12 @@ function haversine(theta_rad){
 }
 
 function haversineDistanceMiles(origin, destination){
+
     let angle = haversineDistanceAngle(
-        origin["latitude"], 
-        origin["longitude"], 
-        destination["latitude"], 
-        destination["longitude"]
+        origin["lat_deg"], 
+        origin["long_deg"], 
+        destination["lat_deg"], 
+        destination["long_deg"]
     );
     return angle * EARTH_RADIUS_MILES;
 }
@@ -197,21 +203,23 @@ loader.load("/static/plane/plane.gltf", function(gltf){
     });
     globe.customThreeObjectUpdate(
         (obj, data) => {  
-            Object.assign(obj.position, globe.getCoords(data["latitude"], data["longitude"], 0.02));
+            
+            Object.assign(obj.position, globe.getCoords(data["lat_deg"], data["long_deg"], 0.02));
                             
-            let rot = headingToRotMatrix(data["heading"], obj.position.clone());
+            let rot = headingToRotMatrix(data["heading_deg"], obj.position.clone());
             let rot4 = new THREE.Matrix4().setFromMatrix3(rot);
 
             obj.setRotationFromMatrix(rot4);
+                        
         }
     );
-    updateGui();
+    
     getFlightInfo().then( async (result) => {
-        globe.pointOfView({"lat": result["latitude"], "lng": result["longitude"], altitude: 0.5}, 3000);
+        globe.pointOfView({"lat": result["lat_deg"], "lng": result["long_deg"], altitude: 0.5}, 3000);
         
-        origin = await getAirportInfo(result["origin"]);
+        origin = await getAirportInfo(result["origin_icao"]);
 
-        destination = await getAirportInfo(result["destination"]);
+        destination = await getAirportInfo(result["destination_icao"]);
         
         globe.htmlElementsData([origin, destination])
         .htmlElement( d => {
@@ -235,6 +243,6 @@ loader.load("/static/plane/plane.gltf", function(gltf){
         )
          
     })
-    
+    updateGui();
     setInterval(updateGui, 5000);
 });
